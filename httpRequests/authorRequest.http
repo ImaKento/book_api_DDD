@@ -1,0 +1,67 @@
+### GET categoryの一覧
+GET http://localhost:3000/api/authors/
+
+### GET categoryの詳細
+GET http://localhost:3000/api/authors/cm9gxprsa0004sivz95lnuqpj
+
+### GET categoryの詳細（validationエラー）
+GET http://localhost:3000/api/authors/am9gxprsa0004sivz95lnuqpj
+
+### POST categoryの作成
+POST http://localhost:3000/api/authors/
+content-type: application/json
+
+{
+    "name": "正岡親規"
+}
+
+### POST categoryの作成（失敗）
+POST http://localhost:3000/api/authors/
+content-type: application/json
+
+{
+    "name": ""
+}
+
+### POST categoryの作成（validationエラー）
+POST http://localhost:3000/api/authors/
+content-type: application/json
+
+{
+    "name": 1
+}
+
+### PATCH categoryの更新
+PATCH http://localhost:3000/api/authors/cm9gxwwi90000si3ugsczlf3e
+content-type: application/json
+
+{
+    "name": "正岡子規"
+}
+
+### PATCH categoryの更新（404エラー）
+PATCH http://localhost:3000/api/authors/caabbbcccdddeeefffggghhhh
+content-type: application/json
+
+{
+    "name": "正岡子規"
+}
+
+### PATCH categoryの更新（失敗）
+PATCH http://localhost:3000/api/authors/cm9gxwwi90000si3ugsczlf3e
+content-type: application/json
+
+{
+    "name": ""
+}
+
+### PATCH categoryの更新（validationエラー）
+PATCH http://localhost:3000/api/authors/cm9gxwwi90000si3ugsczlf3e
+content-type: application/json
+
+{
+    "name": true
+}
+
+### DELETE categoryの削除
+DELETE http://localhost:3000/api/authors/cm9m60omo0000si2ogi7ctfu0

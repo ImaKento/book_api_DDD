@@ -1,0 +1,60 @@
+### GET bookの一覧
+GET http://localhost:3000/api/books/
+
+### GET bookの検索
+GET http://localhost:3000/api/books/?category_name=文学
+
+### GET bookの詳細
+GET http://localhost:3000/api/books/cm9gxprse0009sivzbce0pvxf
+
+### GET bookの詳細（validationエラー）
+GET http://localhost:3000/api/books/am9gxprse0009sivzbce0pvxf
+
+### POST bookの作成
+POST http://localhost:3000/api/books
+content-type: application/json
+
+{
+    "title": "金持ち父さん貧乏倒産"
+}
+
+### POST bookの作成（validationエラー）
+POST http://localhost:3000/api/books
+content-type: application/json
+
+{
+    "title": 1
+}
+
+### PATCH bookの更新
+PATCH http://localhost:3000/api/books/cm9jfrcuj0000sic3tcdqfgef
+content-type: application/json
+
+{
+    "title": "マスターストーン",
+    "author_name": "百田 尚樹",
+    "category_name": "SF"
+}
+
+### PATCH bookの更新（404エラー）
+PATCH http://localhost:3000/api/books/caabbbcccdddeeefffggghhhh
+content-type: application/json
+
+{
+    "title": "マスターストーン",
+    "author_name": "百田 尚樹",
+    "category_name": "SF"
+}
+
+### PATCH bookの更新（validationエラー）
+PATCH http://localhost:3000/api/books/cm9jfrcuj0000sic3tcdqfgef
+content-type: application/json
+
+{
+    "title": "マスターストーン",
+    "author_name": 1,
+    "category_name": "SF"
+}
+
+### DELETE bookの削除
+DELETE http://localhost:3000/api/books/cm9gxz6gi0002si3um08w40zw

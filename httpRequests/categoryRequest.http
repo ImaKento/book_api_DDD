@@ -1,0 +1,62 @@
+### GET categoryの一覧
+GET http://localhost:3000/api/categories/
+
+### GET categoryの詳細
+GET http://localhost:3000/api/categories/cm9gxprsc0008sivz6zug8bds
+
+### GET categoryの詳細（vaidationエラー）
+GET http://localhost:3000/api/categories/am9gxprsc0008sivz6zug8bds
+
+### POST categoryの作成
+POST http://localhost:3000/api/categories/
+content-type: application/json
+
+{
+    "name": "ロマンス",
+    "description": "恋愛をテーマにした小説"
+}
+
+### POST categoryの作成（失敗）
+POST http://localhost:3000/api/categories/
+content-type: application/json
+
+{
+    "name": "",
+    "description": "恋愛をテーマにした小説"
+}
+
+### POST categoryの作成（vaidationエラー）
+POST http://localhost:3000/api/categories/
+content-type: application/json
+
+{
+    "name": "数学",
+    "description": 123
+}
+
+### PATCH categoryの更新
+PATCH http://localhost:3000/api/categories/cm9m640z60001si2odclgo4r5
+content-type: application/json
+
+{
+    "description": "恋愛をテーマにした小説（主に中世）"
+}
+
+### PATCH categoryの更新（404エラー）
+PATCH http://localhost:3000/api/categories/caabbbcccdddeeefffggghhhh
+content-type: application/json
+
+{
+    "description": "恋愛をテーマにした小説（主に近代）"
+}
+
+### PATCH categoryの更新（validationエラー）
+PATCH http://localhost:3000/api/categories/caabbbcccdddeeefffggghhhh
+content-type: application/json
+
+{
+    "description": ["tell me", "Which subject should i study"]
+}
+
+### DELETE categoryの削除
+DELETE http://localhost:3000/api/categories/cm9m640z60001si2odclgo4r5
