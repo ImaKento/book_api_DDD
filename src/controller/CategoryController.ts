@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { PrismaClientKnownRequestError } from '../db/prisma.js';
-import { ICategoryController } from '../domain/category/ICategoryController.js'
-import { ICategoryUsecase } from '../domain/category/ICategoryUsecase.js';
-import { CategoryInput, CategoryUpdate } from '../domain/category/Category.js';
+import { ICategoryController } from '../interface/category/ICategoryController.js'
+import { ICategoryUsecase } from '../interface/category/ICategoryUsecase.js';
+import { CategoryIdSchema, CategoryInputSchema, CategoryUpdateSchema } from '../validation/CategoryValidator.js';
+import { toCategoryId } from '../domain/valueObject/primaryId.js';
 
 export class CategoryController implements ICategoryController {
     constructor(private readonly categoryUsecase: ICategoryUsecase) {}
@@ -22,10 +23,14 @@ export class CategoryController implements ICategoryController {
     }
 
     async getCategoryById(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
+        const parsedId = CategoryIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
 
         try {
-            const category = await this.categoryUsecase.getCategoryById(targetId);
+            const category = await this.categoryUsecase.getCategoryById(toCategoryId(parsedId.data));
             if (!category) {
                 res.status(404).json({ error: 'Category not Found' });
                 return;
@@ -38,15 +43,14 @@ export class CategoryController implements ICategoryController {
     }
 
     async createCategory(req: Request, res: Response): Promise<void> {
-        const { name, description } = req.body;
-        if (!name) {
-            res.status(400).json({ error: 'name is required' });
+        const parsed = CategoryInputSchema.safeParse(req.body);
+        if (!parsed.success) {
+            res.status(400).json({ error: parsed.error.flatten() });
             return;
         }
-        
-        const categoryInput: CategoryInput = { name: name, description: description };
+
         try {
-            const newCategory = await this.categoryUsecase.createCategory(categoryInput);
+            const newCategory = await this.categoryUsecase.createCategory(parsed.data);
             res.status(201).json(newCategory);
         } catch (error) {
             console.log('Failed to create category: ', error);
@@ -55,12 +59,19 @@ export class CategoryController implements ICategoryController {
     }
 
     async updateCategory(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
-        const { name, description } = req.body;
+        const parsedId = CategoryIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
+        const validated = CategoryUpdateSchema.safeParse(req.body);
+        if (!validated.success) {
+            res.status(400).json({ error: validated.error.flatten() });
+            return;
+        }
 
-        const updateInput: CategoryUpdate = { name: name, description: description };
         try {
-            const updatedCategory = await this.categoryUsecase.updateCategory(targetId, updateInput);
+            const updatedCategory = await this.categoryUsecase.updateCategory(toCategoryId(parsedId.data), validated.data);
             res.json(updatedCategory);
         } catch (error) {
             if (
@@ -77,10 +88,14 @@ export class CategoryController implements ICategoryController {
     }
 
     async deleteCategory(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
+        const parsedId = CategoryIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
 
         try {
-            await this.categoryUsecase.deleteCategory(targetId);
+            await this.categoryUsecase.deleteCategory(toCategoryId(parsedId.data));
             res.status(204).end();
         } catch (error) {
             if (

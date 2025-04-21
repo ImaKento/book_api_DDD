@@ -5,7 +5,7 @@ GET http://localhost:3000/api/books/
 GET http://localhost:3000/api/books/?category_name=文学
 
 ### GET bookの詳細
-GET http://localhost:3000/api/books/cm9gxprse0009sivzbce0pvxf
+GET http://localhost:3000/api/books/cm9pecxpb000bsiymrbpvpgyu
 
 ### GET bookの詳細（validationエラー）
 GET http://localhost:3000/api/books/am9gxprse0009sivzbce0pvxf
@@ -27,7 +27,7 @@ content-type: application/json
 }
 
 ### PATCH bookの更新
-PATCH http://localhost:3000/api/books/cm9jfrcuj0000sic3tcdqfgef
+PATCH http://localhost:3000/api/books/cm9pfdhhg0001sib8gr9sw33i
 content-type: application/json
 
 {
@@ -57,4 +57,4 @@ content-type: application/json
 }
 
 ### DELETE bookの削除
-DELETE http://localhost:3000/api/books/cm9gxz6gi0002si3um08w40zw
+DELETE http://localhost:3000/api/books/cm9pfdhhg0001sib8gr9sw33i

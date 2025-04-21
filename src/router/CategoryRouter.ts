@@ -1,5 +1,5 @@
 import express from 'express'
-import { ICategoryController } from '../domain/category/ICategoryController.js';
+import { ICategoryController } from '../interface/category/ICategoryController.js';
 
 function createCategoryRouter(controller: ICategoryController): express.Router {
     const router = express.Router();

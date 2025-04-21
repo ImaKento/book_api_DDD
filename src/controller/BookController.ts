@@ -1,21 +1,22 @@
 import { Request, Response } from 'express';
-import { IBookUsecase } from '../domain/book/IBookUsecase.js';
-import { IBookController } from '../domain/book/IBookController.js'
 import { PrismaClientKnownRequestError } from '../db/prisma.js';
+import { IBookUsecase } from '../interface/book/IBookUsecase.js';
+import { IBookController } from '../interface/book/IBookController.js'
+import { BookCreateSchema, BookIdSchema, BookInputSchema } from '../validation/BookValidator.js';
+import { toBookId } from '../domain/valueObject/primaryId.js';
 
 export class BookController implements IBookController {
     constructor(private readonly bookUsecase: IBookUsecase) {}
 
     async getBooks(req: Request, res: Response): Promise<void> {
-        const { title, author_name, category_name, isbn } = req.query;
+        const parsed = BookInputSchema.safeParse(req.query);
+        if (!parsed.success) {
+            res.status(400).json({ error: parsed.error.flatten() });
+            return;
+        }
         
         try {
-            const books = await this.bookUsecase.getBooks({ 
-                title: title as string, 
-                author_name: author_name as string,
-                category_name: category_name as string,
-                isbn: isbn as string,
-            });
+            const books = await this.bookUsecase.getBooks(parsed.data);
             if (!books) {
                 res.status(404).json({ error: 'Books not Found' });
                 return;
@@ -28,10 +29,14 @@ export class BookController implements IBookController {
     }
 
     async getBookById(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
+        const parsedId = BookIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
 
         try {
-            const book = await this.bookUsecase.getBookById(targetId);
+            const book = await this.bookUsecase.getBookById(toBookId(parsedId.data));
             if (!book) {
                 res.status(404).json({ error: 'Book not Found' });
                 return;
@@ -44,16 +49,19 @@ export class BookController implements IBookController {
     }
 
     async createBook(req: Request, res: Response): Promise<void> {
-        const { title, isbn, author_name, category_name } = req.body;
-        const bookInput = { title: title, isbn: isbn, author_name: author_name, category_name: category_name }
+        const parsed = BookCreateSchema.safeParse(req.body);
+        if (!parsed.success) {
+            res.status(400).json({ error: parsed.error.flatten() });
+            return;
+        }
         
-        if (!bookInput.title) {
+        if (!parsed.data.title) {
             res.status(400).json({ error: 'title is required' });
             return;
         }
 
         try {
-            const newBook = await this.bookUsecase.createBook(bookInput)
+            const newBook = await this.bookUsecase.createBook(parsed.data);
             res.status(201).json(newBook);
         } catch (error) {
             console.log('Failed to create book: ', error);
@@ -62,12 +70,20 @@ export class BookController implements IBookController {
     }
 
     async updateBook(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
-        const { title, isbn, author_name, category_name } = req.body;
-        const bookUpdate = { title: title, isbn: isbn, author_name: author_name, category_name: category_name };
+        const parsedId = BookIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
+
+        const validated = BookInputSchema.safeParse(req.body);
+        if (!validated.success) {
+            res.status(400).json({ error: validated.error.flatten() });
+            return;
+        }
 
         try {
-            const updatedBook = await this.bookUsecase.updateBook(targetId, bookUpdate);
+            const updatedBook = await this.bookUsecase.updateBook(toBookId(parsedId.data), validated.data);
             res.json(updatedBook)
         } catch (error) {
             if (
@@ -84,10 +100,14 @@ export class BookController implements IBookController {
     }
     
     async deleteBook(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
-
+        const parsedId = BookIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
+        
         try {
-            await this.bookUsecase.deleteBook(targetId);
+            await this.bookUsecase.deleteBook(toBookId(parsedId.data));
             res.status(204).end();
         } catch (error) {
             if (

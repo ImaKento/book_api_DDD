@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/categories/
 
 ### GET categoryの詳細
-GET http://localhost:3000/api/categories/cm9gxprsc0008sivz6zug8bds
+GET http://localhost:3000/api/categories/cm9pecxp90005siymlvuue5xy
 
 ### GET categoryの詳細（vaidationエラー）
 GET http://localhost:3000/api/categories/am9gxprsc0008sivz6zug8bds
@@ -35,7 +35,7 @@ content-type: application/json
 }
 
 ### PATCH categoryの更新
-PATCH http://localhost:3000/api/categories/cm9m640z60001si2odclgo4r5
+PATCH http://localhost:3000/api/categories/cm9pf0bin000194sigyc0h510
 content-type: application/json
 
 {
@@ -59,4 +59,4 @@ content-type: application/json
 }
 
 ### DELETE categoryの削除
-DELETE http://localhost:3000/api/categories/cm9m640z60001si2odclgo4r5
+DELETE http://localhost:3000/api/categories/cm9pf0bin000194sigyc0h510

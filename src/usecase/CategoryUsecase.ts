@@ -1,54 +1,34 @@
-import { z, ZodError } from 'zod';
-import { Category, CategoryInput, CategoryUpdate } from '../domain/category/Category.js';
-import { ICategoryUsecase } from '../domain/category/ICategoryUsecase.js';
-import { ICategoryRepository } from '../domain/category/ICategoryRepository.js';
-import { CategoryInputSchema, CategoryInputValid, CategoryUpdateSchema, CategoryUpdateValid } from '../validation/CategoryValidator.js';
+import { ZodError } from 'zod';
+import { CategoryEntity } from '../domain/entity/Category.js';
+import { createString50From, createOptionalString100From } from '../domain/valueObject/wordCount.js';
+import { ICategoryUsecase } from '../interface/category/ICategoryUsecase.js';
+import { ICategoryRepository } from '../interface/category/ICategoryRepository.js';
+import { CategoryInputValid, CategoryUpdateValid } from '../validation/CategoryValidator.js';
+import { CategoryId } from '../domain/valueObject/primaryId.js';
 
 export class CategoryUsecase implements ICategoryUsecase {
     constructor(private readonly categoryRepo: ICategoryRepository) {}
 
-    getCategories(): Promise<Category[] | null> {
+    getCategories(): Promise<CategoryEntity[] | null> {
         return this.categoryRepo.findAll();
     }
 
-    getCategoryById(id: string): Promise<Category | null> {
-        const parsed = z.string().cuid().safeParse(id);
-        if (!parsed.success) {
-            throw new Error(parsed.error.errors.map(e => e.message).join(', '));
-        }
-        return this.categoryRepo.findById(parsed.data);
+    getCategoryById(id: CategoryId): Promise<CategoryEntity | null> {
+        return this.categoryRepo.findById(id);
     }
 
-    createCategory(input: CategoryInput): Promise<Category> {
-        try {
-            const validated: CategoryInputValid =  CategoryInputSchema.parse(input);
-            return this.categoryRepo.create(validated);
-        } catch (error) {
-            if (error instanceof ZodError) {
-                throw new Error(`Validation failed: ${error.errors.map(e => e.message).join(', ')}`);
-            }
-            throw error;
-        }
+    createCategory(input: CategoryInputValid): Promise<CategoryEntity> {
+        const nameVo = createString50From(input.name);
+        const descriptionVo = createOptionalString100From(input.description);
+        const category = CategoryEntity.create({ name: nameVo, description: descriptionVo });
+        return this.categoryRepo.create(category);
     }
 
-    updateCategory(id: string, input: CategoryUpdate): Promise<Category> {
-        try {
-            const validated_id = z.string().cuid().parse(id);
-            const validated: CategoryUpdateValid = CategoryUpdateSchema.parse(input);
-            return this.categoryRepo.update(validated_id, validated);
-        } catch (error) {
-            if (error instanceof ZodError) {
-                throw new Error(`Validation failed: ${error.errors.map(e => e.message).join(', ')}`);
-            }
-            throw error;
-        }
+    updateCategory(id: CategoryId, input: CategoryUpdateValid): Promise<CategoryEntity> {
+        return this.categoryRepo.update(id, input);
     }
 
-    deleteCategory(id: string): Promise<Category> {
-        const parsed = z.string().cuid().safeParse(id);
-        if (!parsed.success) {
-            throw new Error(`Validation failed: ${parsed.error.errors.map(e => e.message).join(', ')}`);
-        }
-        return this.categoryRepo.delete(parsed.data);
+    deleteCategory(id: CategoryId): Promise<CategoryEntity> {
+        return this.categoryRepo.delete(id);
     }
 }

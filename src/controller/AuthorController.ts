@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { PrismaClientKnownRequestError } from '../db/prisma.js';
-import { IAuthorController } from '../domain/author/IAuthorController.js';
-import { IAuthorUsecase } from '../domain/author/IAuthorUsecase.js';
-import { AuthorInput, AuthorUpdate } from '../domain/author/Author.js';
+import { IAuthorController } from '../interface/author/IAuthorController.js';
+import { IAuthorUsecase } from '../interface/author/IAuthorUsecase.js';
+import { AuthorIdSchema, AuthorInputSchema, AuthorUpdateSchema } from '../validation/AuthorValidator.js';
+import { toAuthorId } from '../domain/valueObject/primaryId.js';
 
 export class AuthorController implements IAuthorController {
     constructor(private readonly authorUsecase: IAuthorUsecase) {}
@@ -22,10 +23,14 @@ export class AuthorController implements IAuthorController {
     }
 
     async getAuthorById(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
-
+        const parsedId = AuthorIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
+        
         try {
-            const author = await this.authorUsecase.getAuthorById(targetId);
+            const author = await this.authorUsecase.getAuthorById(toAuthorId(parsedId.data));
             if (!author) {
                 res.status(404).json({ error: 'Author not Found' });
                 return;
@@ -38,16 +43,15 @@ export class AuthorController implements IAuthorController {
     }
 
     async createAuthor(req: Request, res: Response): Promise<void> {
-        const { name } = req.body;
-        if (!name) {
-            res.status(400).json({ error: 'name is required' });
+        const parsed = AuthorInputSchema.safeParse(req.body);
+        if (!parsed.success) {
+            res.status(400).json({ error: parsed.error.flatten() });
             return;
         }
 
-        const authorInput: AuthorInput = { name: name };
         try {
-            const newAuthor = await this.authorUsecase.createAuthor(authorInput);
-            res.json(newAuthor);
+            const newAuthor = await this.authorUsecase.createAuthor(parsed.data);
+            res.status(201).json(newAuthor);
         } catch (error) {
             console.log('Failed to create author: ', error);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -55,16 +59,20 @@ export class AuthorController implements IAuthorController {
     }
 
     async updateAuthor(req: Request, res: Response): Promise<void> {
-        const targetId = req.params.id;
-        const { name } = req.body;
-        if (!name) {
-            res.status(400).json({ error: 'name is required' });
+        const parsedId = AuthorIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
             return;
         }
 
-        const updateInput: AuthorUpdate = { name: name };
+        const validated = AuthorUpdateSchema.safeParse(req.body);
+        if (!validated.success) {
+            res.status(400).json({ error: validated.error.flatten() });
+            return;
+        }
+
         try {
-            const updatedAuthor = await this.authorUsecase.updateAuthor(targetId, updateInput);
+            const updatedAuthor = await this.authorUsecase.updateAuthor(toAuthorId(parsedId.data), validated.data);
             res.json(updatedAuthor);
         } catch (error) {
             if (
@@ -81,10 +89,14 @@ export class AuthorController implements IAuthorController {
     }
 
     async deleteAuthor(req: Request, res: Response): Promise<void> {
-        const taregetId = req.params.id;
+        const parsedId = AuthorIdSchema.safeParse(req.params.id);
+        if (!parsedId.success) {
+            res.status(400).json({ error: parsedId.error.flatten() });
+            return;
+        }
 
         try {
-            await this.authorUsecase.deleteAuthor(taregetId);
+            await this.authorUsecase.deleteAuthor(toAuthorId(parsedId.data));
             res.status(204).end();
         } catch (error) {
             if (

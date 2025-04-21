@@ -1,4 +1,4 @@
-import express, { application } from "express";
+import express from "express";
 import { prisma } from './src/db/prisma.js';
 import { BookRepository } from './src/repository/BookRepository.js';
 import { CategoryRepository } from './src/repository/CategoryRepository.js';

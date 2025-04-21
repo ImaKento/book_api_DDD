@@ -1,5 +1,5 @@
 import express from 'express';
-import { IBookController } from '../domain/book/IBookController.js';
+import { IBookController } from '../interface/book/IBookController.js';
 
 function createBookRouter(controller: IBookController): express.Router {
     const router = express.Router();

@@ -1,5 +1,5 @@
 import express from 'express'
-import { IAuthorController } from '../domain/author/IAuthorController.js';
+import { IAuthorController } from '../interface/author/IAuthorController.js';
 
 function createAuthorRouter(controller: IAuthorController): express.Router {
     const router = express.Router();

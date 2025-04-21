@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/authors/
 
 ### GET categoryの詳細
-GET http://localhost:3000/api/authors/cm9gxprsa0004sivz95lnuqpj
+GET http://localhost:3000/api/authors/cm9pecxp60000siymurl2rm52
 
 ### GET categoryの詳細（validationエラー）
 GET http://localhost:3000/api/authors/am9gxprsa0004sivz95lnuqpj
@@ -32,7 +32,7 @@ content-type: application/json
 }
 
 ### PATCH categoryの更新
-PATCH http://localhost:3000/api/authors/cm9gxwwi90000si3ugsczlf3e
+PATCH http://localhost:3000/api/authors/cm9peef6d00006vsifzlj503d
 content-type: application/json
 
 {
@@ -64,4 +64,4 @@ content-type: application/json
 }
 
 ### DELETE categoryの削除
-DELETE http://localhost:3000/api/authors/cm9m60omo0000si2ogi7ctfu0
+DELETE http://localhost:3000/api/authors/cm9pecxp70004siymjtl6h1so
