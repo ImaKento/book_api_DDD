@@ -15,7 +15,7 @@ docker-compose up -d
 ### アプリコンテナへのアクセス
 
 ```bash
-docker exec -it book_api-app-1 /bin/bash
+docker exec -it book_api_DDD-app-1 /bin/bash
 ```
 
 ### Prismaマイグレーションの実行
@@ -48,7 +48,7 @@ npx prisma studio
 ### DBコンテナへのアクセス
 
 ```bash
-docker exec -it book_api-db-1 /bin/bash
+docker exec -it book_api_DDD-db-1 /bin/bash
 ```
 
 ### PostgreSQLへの接続
